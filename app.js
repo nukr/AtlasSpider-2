@@ -7,7 +7,7 @@ var mongoose    = require('mongoose');
 var Coupon      = mongoose.model('Coupon');
 var ProgressBar = require('progress');
 
-mongoose.connect('mongodb://127.0.0.1/coupon', function (err) {
+mongoose.connect('mongodb://admin:3345678@127.0.0.1/coupon', function (err) {
   if (err) {
     console.error('connect to %s error: ', 'mongodb://127.0.0.1/coupon', err.message);
     process.exit(1);
