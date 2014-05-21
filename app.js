@@ -14,12 +14,6 @@ mongoose.connect('mongodb://127.0.0.1/coupon', function (err) {
   }
 });
 
-function parseXml2Js() {
-}
-function isExpire(doc) {
-}
-function isExist(doc) {
-}
 function newCoupon(coupon) {
     var display = coupon.data[0].display[0]
     var nuomi = new Coupon({
@@ -86,7 +80,7 @@ function xml2db(onsuccess, onfailure) {
 }
 
 console.log('starting download xml');
-request.get('http://www.nuomi.com/api/dailydeal?version=v1&city=shanghai').pipe(fs.createWriteStream('nuomi.xml'))
+request.get('http://www.nuomi.com/api/dailydeal?version=v1&city=shanghai').pipe(fs.createWriteStream(__dirname + '/nuomi.xml'))
 .on('close', function (err) {
     console.log('download done');
     xml2db();
