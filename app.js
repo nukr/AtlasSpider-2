@@ -4,7 +4,7 @@ var fs          = require('fs');
 var request     = require('request');
 var xml2js      = require('xml2js');
 var mongoose    = require('mongoose');
-var Coupon      = mongoose.model('Coupon');
+var Coupon      = require('./models').Coupon;
 var ProgressBar = require('progress');
 var async = require('async');
 
