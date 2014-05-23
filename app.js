@@ -8,12 +8,46 @@ var Coupon      = mongoose.model('Coupon');
 var ProgressBar = require('progress');
 var async = require('async');
 
-mongoose.connect('mongodb://admin:3345678@127.0.0.1/coupon', function (err) {
-  if (err) {
-    console.error('connect to %s error: ', 'mongodb://127.0.0.1/coupon', err.message);
-    process.exit(1);
-  }
-});
+function requestNuomiXML(callback) {
+    console.log('Starting download xml');
+    request.get('http://www.nuomi.com/api/dailydeal?version=v1&city=shanghai').pipe(fs.createWriteStream(__dirname + '/nuomi.xml'))
+    .on('close', function (err) {
+        console.log('Download Done');
+        callback();
+    });
+}
+
+function parseXML(callback){
+    console.log('Parsing XML ...');
+    var parser = new xml2js.Parser();
+    fs.readFile(__dirname + '/nuomi.xml', function (err, data) {
+        if (err) throw err;
+        parser.parseString(data, function (err, result) {
+            if (err) throw err;
+            console.log('Parse Done');
+            callback(null, result);
+        });
+    });
+}
+
+function isExist(coupon, callback) {
+    Coupon.find({web_url: coupon.loc}, function (err, doc) {
+        if (err) throw err;
+        if (doc.length === 0) {
+            callback(false);
+        } else {
+            callback(true);
+        }
+    });
+}
+
+function isExpire(date, callback) {
+    if (date < new Date()) {
+        callback(true);
+    } else {
+        callback(false);
+    }
+}
 
 function requestNuomiXML(callback) {
     console.log('Starting download xml');
@@ -113,9 +147,6 @@ function xml2db(coupons) {
     });
 }
 
-async.series([
-    requestNuomiXML,
-    parseXML
-], function (err, result) {
+async.series([requestNuomiXML, parseXML], function (err, result) {
     xml2db(result[1].urlset.url);
 });
